@@ -5,7 +5,10 @@ fun obtainQuest(
     playerLevel: Int,
     hasAngeredBarbarians: Boolean = false,
     playerClass: String = "paladin",
-    hasBefriendedBarbarians: Boolean = true): String {
+    hasBefriendedBarbarians: Boolean = true): String? {
+    if (playerLevel <= 0) {
+        throw IllegalArgumentException("Player level must be greater than 0.")
+    }
     return when (playerLevel) {
         1 -> "Meet Mr. Bubbles in the land of soft things."
         in 2..5 -> {
@@ -16,23 +19,33 @@ fun obtainQuest(
         6 -> "Locate the enchanted sword."
         7 -> "Recover the long-lost artifact of creation."
         8 -> "Defeat Nogartse, bringer of death and eater of worlds."
-        else -> "There are no quests right now."
+        else -> null
     }
 }
 
 fun readBountyBoard() {
-    println(
-        """
-            |$HERO_NAME approaches the bounty board. It reads:
-            |   "${obtainQuest(playerLevel).replace("Nogartse","xxxxxxxx")}"
-        """.trimMargin()
-    )
+    try{
+        val quest: String? = obtainQuest(playerLevel)
+        val censoredQuest = quest?.replace("Nogartse", "xxxxxxxx")
+        if (censoredQuest != null) {
+            println(
+                """
+        |$HERO_NAME approaches the bounty board. It reads:
+        |   "$censoredQuest"
+            """.trimMargin()
+            )
+        }
+    } catch (e: Exception) {
+        println("$HERO_NAME can't read what's on the bounty board.")
+    }
+
 }
+
 
 fun main() {
     println("$HERO_NAME announces her presence to the world.")
     println("What level is $HERO_NAME")
-    val playerLevelInput = readLine()!!
+    val playerLevelInput = readln()
     playerLevel = if (playerLevelInput.matches("""\d+""".toRegex())) {
         playerLevelInput.toInt()
     }
